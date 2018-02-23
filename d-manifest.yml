@@ -1,0 +1,14 @@
+<username>/packaging-travis:
+  BuildWith: 
+  Build:
+    - npm install
+    - npm test
+  PkgInclude:
+    - '*'
+  PreInstall:
+    - sudo apt-get -y update
+    - sudo apt-get -y install nodejs
+  Env:
+    - PORT: "3000"
+  Exec:
+    - nodejs app.js
