@@ -69,71 +69,71 @@ namespace :pl do
       end
       rm_r work_dir
       packaging_name = "#{Pkg::Config.project}-packaging-#{Pkg::Config.build_date}-#{Pkg::Config.ref}"
-      Pkg::Util::RakeUtils.invoke_task("pl:jenkins:trigger_dynamic_job", packaging_name)
-
-      if poll_interval > 0
-        ##
-        # Wait for the '*packaging*' job to finish.
-        #
-        name = "#{Pkg::Config.project}-packaging-#{Pkg::Config.build_date}-#{Pkg::Config.ref}"
-        packaging_job_url = "http://#{Pkg::Config.jenkins_build_host}/job/#{name}"
-
-        packaging_build_hash = nil
-        Pkg::Util::Execution.retry_on_fail(:times => 10, :delay => 1) do
-          packaging_build_hash = Pkg::Util::Jenkins.poll_jenkins_job(packaging_job_url)
-        end
-
-        ##
-        # Output status of packaging build for cli consumption
-        #
-        puts "Packaging #{packaging_build_hash['result']}"
-
-        if packaging_build_hash['result'] == 'FAILURE'
-          fail "Please see #{packaging_job_url} for failure details."
-        end
-
-        if Pkg::Config.build_msi
-          ##
-          # Wait for the '*msi*' job to finish.
-          #
-          name = "#{Pkg::Config.project}-msi-#{Pkg::Config.build_date}-#{Pkg::Config.short_ref}"
-          msi_job_url = "http://#{Pkg::Config.jenkins_build_host}/job/#{name}"
-
-          msi_build_hash = nil
-          Pkg::Util::Execution.retry_on_fail(:times => 10, :delay => 1) do
-            msi_build_hash = Pkg::Util::Jenkins.poll_jenkins_job(msi_job_url)
-          end
-
-          ##
-          # Output status of msi build for cli consumption
-          #
-          puts "MSI #{msi_build_hash['result']}"
-
-          if msi_build_hash['result'] == 'FAILURE'
-            fail "Please see #{msi_job_url} for failure details."
-          end
-        end
-
-        ##
-        # Wait for the '*repo*' job to finish.
-        #
-        name = "#{Pkg::Config.project}-repo-#{Pkg::Config.build_date}-#{Pkg::Config.ref}"
-        repo_job_url = "http://#{Pkg::Config.jenkins_build_host}/job/#{name}"
-
-        repo_build_hash = nil
-        Pkg::Util::Execution.retry_on_fail(:times => 10, :delay => 1) do
-          repo_build_hash = Pkg::Util::Jenkins.poll_jenkins_job(repo_job_url)
-        end
-
-        ##
-        # Output status of repo build for cli consumption
-        #
-        puts "Repo Creation #{repo_build_hash['result']}"
-
-        if repo_build_hash['result'] == 'FAILURE'
-          fail "Please see #{repo_job_url} for failure details."
-        end
-      end
+#      Pkg::Util::RakeUtils.invoke_task("pl:jenkins:trigger_dynamic_job", packaging_name)
+#
+#      if poll_interval > 0
+#        ##
+#        # Wait for the '*packaging*' job to finish.
+#        #
+#        name = "#{Pkg::Config.project}-packaging-#{Pkg::Config.build_date}-#{Pkg::Config.ref}"
+#        packaging_job_url = "http://#{Pkg::Config.jenkins_build_host}/job/#{name}"
+#
+#        packaging_build_hash = nil
+#        Pkg::Util::Execution.retry_on_fail(:times => 10, :delay => 1) do
+#          packaging_build_hash = Pkg::Util::Jenkins.poll_jenkins_job(packaging_job_url)
+#        end
+#
+#        ##
+#        # Output status of packaging build for cli consumption
+#        #
+#        puts "Packaging #{packaging_build_hash['result']}"
+#
+#        if packaging_build_hash['result'] == 'FAILURE'
+#          fail "Please see #{packaging_job_url} for failure details."
+#        end
+#
+#        if Pkg::Config.build_msi
+#          ##
+#          # Wait for the '*msi*' job to finish.
+#          #
+#          name = "#{Pkg::Config.project}-msi-#{Pkg::Config.build_date}-#{Pkg::Config.short_ref}"
+#          msi_job_url = "http://#{Pkg::Config.jenkins_build_host}/job/#{name}"
+#
+#          msi_build_hash = nil
+#          Pkg::Util::Execution.retry_on_fail(:times => 10, :delay => 1) do
+#            msi_build_hash = Pkg::Util::Jenkins.poll_jenkins_job(msi_job_url)
+#          end
+#
+#          ##
+#          # Output status of msi build for cli consumption
+#          #
+#          puts "MSI #{msi_build_hash['result']}"
+#
+#          if msi_build_hash['result'] == 'FAILURE'
+#            fail "Please see #{msi_job_url} for failure details."
+#          end
+#        end
+#
+#        ##
+#        # Wait for the '*repo*' job to finish.
+#        #
+#        name = "#{Pkg::Config.project}-repo-#{Pkg::Config.build_date}-#{Pkg::Config.ref}"
+#        repo_job_url = "http://#{Pkg::Config.jenkins_build_host}/job/#{name}"
+#
+#        repo_build_hash = nil
+#        Pkg::Util::Execution.retry_on_fail(:times => 10, :delay => 1) do
+#          repo_build_hash = Pkg::Util::Jenkins.poll_jenkins_job(repo_job_url)
+#        end
+#
+#        ##
+#        # Output status of repo build for cli consumption
+#        #
+#        puts "Repo Creation #{repo_build_hash['result']}"
+#
+#        if repo_build_hash['result'] == 'FAILURE'
+#          fail "Please see #{repo_job_url} for failure details."
+#        end
+#      end
     end
 
     # Task to trigger the jenkins job we just created. This uses a lot of the
