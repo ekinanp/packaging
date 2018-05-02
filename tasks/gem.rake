@@ -142,5 +142,8 @@ if Pkg::Config.build_gem
   # An alias task to simplify our remote logic in jenkins.rake
   namespace :pl do
     task :gem => "package:gem"
+    task :list_gem_files => ["clean"] do
+      puts(glob_gem_files.to_s)
+    end
   end
 end
