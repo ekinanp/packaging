@@ -61,6 +61,7 @@ module Pkg::Params
                   :gem_host,
                   :gem_name,
                   :gem_path,
+                  :gem_platforms,
                   :gem_platform_dependencies,
                   :gem_rdoc_options,
                   :gem_require_path,
@@ -289,7 +290,9 @@ module Pkg::Params
               { :var => :pe_feature_branch,       :val => false },
               { :var => :pe_release_branch,       :val => false },
               { :var => :s3_ship,                 :val => false },
-              { :var => :apt_releases,            :val => Pkg::Platforms.codenames("deb") }]
+              { :var => :apt_releases,            :val => Pkg::Platforms.codenames("deb") },
+              { :var => :gem_platforms,           :val => [] }]
+
 
   # These are variables which, over time, we decided to rename or replace. For
   # backwards compatibility, we assign the value of the old/deprecated

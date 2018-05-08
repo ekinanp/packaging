@@ -128,6 +128,35 @@ if Pkg::Config.build_gem
     end
   end
 
+  # Used only in the package:gem_build task. Builds the gem in the
+  # project_root directory, then moves it over to pkg/
+  def gem_build(gemspec, options = {})
+    # Memoize the gem command
+    @gem ||= Pkg::Util::Tool.find_tool('gem', required: true)
+
+    cmd = "#{@gem} build #{gemspec}"
+    cmd.prepend("GEM_PLATFORM='#{options[:gem_platform]}' ") if options[:gem_platform]
+
+    puts("")
+    Pkg::Util::Execution.capture3(cmd, debug = true)
+    puts("")
+
+    # gem build will build "<gem_name>-<gem_version>.gem" from the gemspec.
+    # We know <gem_name> will be the project, while <gem_version> is calculated
+    # inside the gemspec by reading it from a version file. For platform-specific gems
+    # we want our gem to be named "<gem_name>-<gem_version>-<gem_platform>.gem".
+    # Unfortunately, there is no way to give "gem build" the gem file's destination
+    # path. So for platform-specific gems, we will need to add the gem platform to
+    # the default gem path.
+    default_gem_dest = Dir.glob("#{Pkg::Config.project}-*.gem").first
+    actual_gem_dest = File.join("pkg", default_gem_dest)
+    actual_gem_dest.gsub!(/\.gem$/, "-#{options[:gem_platform]}.gem") if options[:gem_platform]
+
+    puts("Built the default gem '#{default_gem_dest}' successfuly!")
+    puts("Now moving it to its actual destination '#{actual_gem_dest}'")
+    mv(default_gem_dest, actual_gem_dest)
+  end
+
   namespace :package do
     desc "Build a gem - All gems if platform specific"
     task :gem => ["clean"] do
@@ -137,10 +166,31 @@ if Pkg::Config.build_gem
         create_platform_specific_gems
       end
     end
+
+    task :gem_build do
+      cd Pkg::Config.project_root do
+        # TODO: Substitute .gemspec with naming convention. Perhaps
+        # <project>.gemspec?
+        project = Pkg::Config.project
+        gemspec = '.gemspec'
+        unless File.exist?(gemspec)
+          fail "#{project} does not have a #{gemspec} file!"
+        end
+  
+        mkdir_p "pkg"
+
+        # Build the default gem first, then the platform specific ones.
+        gem_build(gemspec)
+        Pkg::Config.gem_platforms.each do |gem_platform|
+          gem_build(gemspec, gem_platform: gem_platform)
+        end
+      end
+    end
   end
 
   # An alias task to simplify our remote logic in jenkins.rake
   namespace :pl do
     task :gem => "package:gem"
+    task :gem_build => "package:gem_build"
   end
 end
